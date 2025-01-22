@@ -44,7 +44,11 @@ class ContactApi(BaseApi):
     async def get_available_contact_reports(self, request: web.Request):
         contacts = self._api_manager.get_available_contact_reports()
         return web.json_response(contacts)
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> upstream/magma-wip
     async def get_contact_list(self, request: web.Request):
         contacts = [dict(name=c.name, description=c.description) for c in self._api_manager.contact_svc.contacts]
         return web.json_response(contacts)

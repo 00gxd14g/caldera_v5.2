@@ -30,10 +30,17 @@ class RestApi(BaseWorld):
 
     async def enable(self):
         self.app_svc.application.router.add_static('/assets', 'plugins/magma/dist/assets/', append_version=True)
+<<<<<<< HEAD
         # TODO: only serve static files in legacy plugin mode
         self.app_svc.application.router.add_static('/gui', 'static/', append_version=True)
         # unauthorized GUI endpoints
         self.app_svc.application.router.add_route('GET', '/', self.landing)
+=======
+        self.app_svc.application.router.add_static('/gui', 'static/', append_version=True)
+        # unauthorized GUI endpoints
+        self.app_svc.application.router.add_route('GET', '/', self.landing)
+        self.app_svc.application.router.add_route('GET', '/{tail:(?!plugin/).*}', self.handle_catch)
+>>>>>>> upstream/magma-wip
         self.app_svc.application.router.add_route('POST', '/enter', self.validate_login)
         self.app_svc.application.router.add_route('POST', '/logout', self.logout)
         # unauthorized API endpoints
@@ -43,7 +50,10 @@ class RestApi(BaseWorld):
         self.app_svc.application.router.add_route('*', '/api/rest', self.rest_core)
         self.app_svc.application.router.add_route('GET', '/api/{index}', self.rest_core_info)
         self.app_svc.application.router.add_route('GET', '/file/download_exfil', self.download_exfil_file)
+<<<<<<< HEAD
         self.app_svc.application.router.add_route('GET', '/{tail:(?!plugin/|api/v2/).*}', self.handle_catch)
+=======
+>>>>>>> upstream/magma-wip
 
     async def validate_login(self, request):
         return await self.auth_svc.login_user(request)

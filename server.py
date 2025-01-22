@@ -97,7 +97,11 @@ def run_tasks(services, run_vue_server=False):
     loop.create_task(learning_svc.build_model())
     loop.create_task(app_svc.watch_ability_files())
     loop.run_until_complete(start_server())
+<<<<<<< HEAD
     loop.run_until_complete(event_svc.fire_event(exchange="system", queue="ready"))
+=======
+    loop.run_until_complete(event_svc.fire_event(exchange='system', queue='ready'))
+>>>>>>> upstream/magma-wip
     if run_vue_server:
         loop.run_until_complete(start_vue_dev_server())
     try:
@@ -126,7 +130,21 @@ def init_swagger_documentation(app):
     app.middlewares.append(apispec_request_validation_middleware)
     app.middlewares.append(validation_middleware)
 
+async def enable_cors(request, response):
+    response.headers['Access-Control-Allow-Origin'] = 'http://' + args.uiDevHost + ':3000'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD'
+    response.headers['Access-Control-Allow-Headers'] = 'Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers'
 
+async def start_vue_dev_server():
+    await asyncio.create_subprocess_shell(
+        'npm run dev',
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        cwd='./plugins/magma/')
+    logging.info('VueJS development server is live.')
+
+<<<<<<< HEAD
 async def enable_cors(request, response):
     response.headers["Access-Control-Allow-Origin"] = (
         "http://" + args.uiDevHost + ":3000"
@@ -138,6 +156,23 @@ async def enable_cors(request, response):
     response.headers["Access-Control-Allow-Headers"] = (
         "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
     )
+=======
+if __name__ == '__main__':
+    def list_str(values):
+        return values.split(',')
+    sys.path.append('')
+    parser = argparse.ArgumentParser('Welcome to the system')
+    parser.add_argument('-E', '--environment', required=False, default='local', help='Select an env. file to use')
+    parser.add_argument("-l", "--log", dest="logLevel", choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+                        help="Set the logging level", default='INFO')
+    parser.add_argument('--fresh', action='store_true', required=False, default=False,
+                        help='remove object_store on start')
+    parser.add_argument('-P', '--plugins', required=False, default=os.listdir('plugins'),
+                        help='Start up with a single plugin', type=list_str)
+    parser.add_argument('--insecure', action='store_true', required=False, default=False,
+                        help='Start caldera with insecure default config values. Equivalent to "-E default".')
+    parser.add_argument('--uidev', dest='uiDevHost', help='Start VueJS dev server for front-end alongside the caldera server. Provide hostname, i.e. localhost.')
+>>>>>>> upstream/magma-wip
 
 
 async def start_vue_dev_server():
@@ -253,6 +288,7 @@ if __name__ == "__main__":
     learning_svc = LearningService()
     event_svc = EventService()
 
+<<<<<<< HEAD
     app_svc = AppService(
         application=web.Application(
             client_max_size=5120**2, middlewares=[pass_option_middleware]
@@ -286,6 +322,13 @@ if __name__ == "__main__":
                 " If attempting to start Caldera v5 for the first time, the `--build` flag must be"
                 " supplied to trigger the building of the Vue source components.[/bright_yellow]"
             )
+=======
+    app_svc = AppService(application=web.Application(client_max_size=5120**2, middlewares=[pass_option_middleware]))
+    app_svc.register_subapp('/api/v2', app.api.v2.make_app(app_svc.get_services()))
+    init_swagger_documentation(app_svc.application)
+    if (args.uiDevHost):    
+        app_svc.application.on_response_prepare.append(enable_cors)
+>>>>>>> upstream/magma-wip
 
     if args.fresh:
         logging.info(
